@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31105.61
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "computer-graphics-assignment-2", "computer-graphics-assignment-2\computer-graphics-assignment-2.vcxproj", "{FA605EA5-4C07-48C3-BBA2-C1F8AFD7E549}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FA605EA5-4C07-48C3-BBA2-C1F8AFD7E549}.Debug|x64.ActiveCfg = Debug|x64
+		{FA605EA5-4C07-48C3-BBA2-C1F8AFD7E549}.Debug|x64.Build.0 = Debug|x64
+		{FA605EA5-4C07-48C3-BBA2-C1F8AFD7E549}.Release|x64.ActiveCfg = Release|x64
+		{FA605EA5-4C07-48C3-BBA2-C1F8AFD7E549}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C9DA6C5-A4E6-4DEF-B1DE-C948E58F3ADF}
+	EndGlobalSection
+EndGlobal
