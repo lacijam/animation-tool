@@ -8,7 +8,7 @@ V3& operator+=(V3 &v, V3 w)
     return v;
 }
 
-V3 &operator+=(V3 &v, real32 w)
+V3 &operator+=(V3 &v, float w)
 {
 	v.x += w;
 	v.y += w;
@@ -24,7 +24,7 @@ V3& operator-=(V3 &v, V3 w)
     return v;
 }
 
-bool32 operator==(V3 v, V3 w)
+bool operator==(V3 v, V3 w)
 {
 	return v.x == w.x
 		&& v.y == w.y
@@ -49,7 +49,7 @@ V3 operator-(const V3 &v, const V3 &w)
 	};
 }
 
-V3 operator*(const V3 &v, const real32 s)
+V3 operator*(const V3 &v, const float s)
 {
     return {
         v.x * s,
@@ -58,7 +58,7 @@ V3 operator*(const V3 &v, const real32 s)
     };
 }
 
-V3 operator*(const real32 s, const V3 &v)
+V3 operator*(const float s, const V3 &v)
 {
     return v * s;
 }
@@ -79,7 +79,7 @@ V2 operator-(const V2 &v, const V2 &w)
 	};
 }
 
-V2 operator+(const V2 &v, const real32 &a)
+V2 operator+(const V2 &v, const float &a)
 {
 	return {
 		v.x + a,
@@ -87,7 +87,7 @@ V2 operator+(const V2 &v, const real32 &a)
 	};
 }
 
-V2 operator-(const V2 &v, const real32 &a)
+V2 operator-(const V2 &v, const float &a)
 {
 	return {
 		v.x - a,
@@ -95,7 +95,7 @@ V2 operator-(const V2 &v, const real32 &a)
 	};
 }
 
-V2 operator*(const V2 &v, const real32& a)
+V2 operator*(const V2 &v, const float& a)
 {
 	return {
 		v.x * a,
@@ -103,19 +103,19 @@ V2 operator*(const V2 &v, const real32& a)
 	};
 }
 
-V2 operator*(const real32& a, const V2 &v)
+V2 operator*(const float& a, const V2 &v)
 {
 	return v * a;
 }
 
-real32 radians(const real32 degrees)
+float radians(const float degrees)
 {
-	return degrees * (real32)(M_PI / 180.0);
+	return degrees * (float)(M_PI / 180.0);
 }
 
 V3 v3_normalise(V3 v)
 {
-	real32 magnitude = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+	float magnitude = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 	return {
 		v.x / magnitude,
 		v.y / magnitude,
@@ -123,12 +123,12 @@ V3 v3_normalise(V3 v)
 	};
 }
 
-real32 v3_dot(V3 a, V3 b)
+float v3_dot(V3 a, V3 b)
 {
 	return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
-real32 v2_dot(V2 a, V2 b)
+float v2_dot(V2 a, V2 b)
 {
 	return a.x * b.x + a.y * b.y;
 }
@@ -142,20 +142,27 @@ V3 v3_cross(V3 a, V3 b)
 	};
 }
 
-void mat4_copy(real32* dest, real32* src)
+V3 v4_to_v3(V4 v)
 {
-	for (u32 i = 0; i < 16; i++) {
+	return {
+		v.x, v.y, v.z
+	};
+}
+
+void mat4_copy(float* dest, float* src)
+{
+	for (unsigned int i = 0; i < 16; i++) {
 		dest[i] = src[i];
 	}
 }
 
-void mat4_multiply(real32* result, const real32* lhs, const real32* rhs)
+void mat4_multiply(float* result, const float* lhs, const float* rhs)
 {
-	for (u32 i = 0; i < 4; ++i) {
-		for (u32 j = 0; j < 4; ++j) {
-			real32 n = 0.f;
+	for (unsigned int i = 0; i < 4; ++i) {
+		for (unsigned int j = 0; j < 4; ++j) {
+			float n = 0.f;
 			
-			for (u32 k = 0; k < 4; ++k) {
+			for (unsigned int k = 0; k < 4; ++k) {
 				n += lhs[i + k * 4] * rhs[k + j * 4];
 			}
 
@@ -164,81 +171,81 @@ void mat4_multiply(real32* result, const real32* lhs, const real32* rhs)
 	}
 }
 
-void mat4_translate(real32* matrix, const real32 tx, const real32 ty, const real32 tz)
+void mat4_translate(float* matrix, const float tx, const float ty, const float tz)
 {
 	matrix[12] += (matrix[0] * tx) + (matrix[4] * ty) + (matrix[8]  * tz);
 	matrix[13] += (matrix[1] * tx) + (matrix[5] * ty) + (matrix[9]  * tz);
 	matrix[14] += (matrix[2] * tx) + (matrix[6] * ty) + (matrix[10] * tz);
 }
 
-void mat4_remove_translation(real32* matrix)
+void mat4_remove_translation(float* matrix)
 {
 	matrix[12] = 0.f;
 	matrix[13] = 0.f;
 	matrix[14] = 0.f;
 }
 
-void mat4_scale(real32* matrix, const real32 sx, const real32 sy, const real32 sz)
+void mat4_scale(float* matrix, const float sx, const float sy, const float sz)
 {
-	for (u32 i = 0; i < 4; ++i) {
+	for (unsigned int i = 0; i < 4; ++i) {
 		matrix[i]     *= sx;
 		matrix[i + 4] *= sy;
 		matrix[i + 8] *= sz;
 	}
 }
 
-void mat4_rotate_x(real32* matrix, const real32 degs)
+void mat4_rotate_x(float* matrix, const float degs)
 {
-	const real32 rads = radians(degs);
-	const real32 sin_t = sinf(rads);
-	const real32 cos_t = cosf(rads);
+	const float rads = radians(degs);
+	const float sin_t = sinf(rads);
+	const float cos_t = cosf(rads);
 
-	for (u32 i = 0; i < 4; ++i) {
-		const real32 a = matrix[i + 4];
-		const real32 b = matrix[i + 8];
+	for (unsigned int i = 0; i < 4; ++i) {
+		const float a = matrix[i + 4];
+		const float b = matrix[i + 8];
 		matrix[i + 4] = a * cos_t + b * sin_t;
 		matrix[i + 8] = b * cos_t - a * sin_t;
 	}
 }
 
-void mat4_rotate_y(real32* matrix, const real32 degs)
+void mat4_rotate_y(float* matrix, const float degs)
 {
-	const real32 rads = radians(degs);
-	const real32 sin_t = sinf(rads);
-	const real32 cos_t = cosf(rads);
+	const float rads = radians(degs);
+	const float sin_t = sinf(rads);
+	const float cos_t = cosf(rads);
 
-	for (u32 i = 0; i < 4; ++i) {
-		const real32 a = matrix[i];
-		const real32 b = matrix[i + 8];
+	for (unsigned int i = 0; i < 4; ++i) {
+		const float a = matrix[i];
+		const float b = matrix[i + 8];
 		matrix[i]     = a * cos_t - b * sin_t;
 		matrix[i + 8] = a * sin_t + b * cos_t;
 	}
 }
 
-void mat4_rotate_z(real32* matrix, const real32 degs)
+void mat4_rotate_z(float* matrix, const float degs)
 {
-	const real32 rads = radians(degs);
-	const real32 sin_t = sinf(rads);
-	const real32 cos_t = cosf(rads);
+	const float rads = radians(degs);
+	const float sin_t = sinf(rads);
+	const float cos_t = cosf(rads);
 
-	for (u32 i = 0; i < 4; ++i) {
-		const real32 a = matrix[i];
-		const real32 b = matrix[i + 4];
+	for (unsigned int i = 0; i < 4; ++i) {
+		const float a = matrix[i];
+		const float b = matrix[i + 4];
 		matrix[i]     = a * cos_t + b * sin_t;
 		matrix[i + 4] = b * cos_t - a * sin_t;
 	}
 }
 
-void mat4_identity(real32* matrix)
+void mat4_identity(float* matrix)
 {
-	for (u8 i = 0; i < 16; i++) {
+	for (unsigned char i = 0; i < 16; i++) {
 		matrix[i] = 0;
 	}
 
 	matrix[0] = matrix[5] = matrix[10] = matrix[15] = 1;
 }
 
-void mat4_ortho(real32* matrix, real32 left, real32 right, real32 bottom, real32 top, real32 near, real32 far)
+void mat4_ortho(float* matrix, float left, float right, float bottom, float top, float near, float far)
 {
 	mat4_identity(matrix);
 	matrix[0] = 2.f / (right - left);
@@ -249,7 +256,7 @@ void mat4_ortho(real32* matrix, real32 left, real32 right, real32 bottom, real32
 	matrix[14] = -1.f * (far + near) / (far - near);
 }
 
-void mat4_frustrum(real32* matrix, real32 left, real32 right, real32 bottom, real32 top, real32 near, real32 far)
+void mat4_frustrum(float* matrix, float left, float right, float bottom, float top, float near, float far)
 {
 	mat4_identity(matrix);
 	matrix[0] = (2 * near) / (right - left);
@@ -261,7 +268,7 @@ void mat4_frustrum(real32* matrix, real32 left, real32 right, real32 bottom, rea
 	matrix[14] = - (2 * far * near) / (far - near);
 }
 
-void mat4_look_at(real32* matrix, V3 eye, V3 centre, V3 up)
+void mat4_look_at(float* matrix, V3 eye, V3 centre, V3 up)
 {
 	V3 F, T, S, U;
 	

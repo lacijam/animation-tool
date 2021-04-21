@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "types.h"
+
 
 #define GLF(name, uppername) PFNGL##uppername##PROC gl##name
 GL_FUNCS;
@@ -38,12 +38,12 @@ static void win32_gl_load_extensions()
     #undef WGLF
 }
 
-static bool32 win32_wgl_is_supported(const char *str)
+static bool win32_wgl_is_supported(const char *str)
 {
     char *wext_str = _strdup(wglGetExtensionsStringARB(wglGetCurrentDC()));
     char *next = NULL;
     char *wext = strtok_s(wext_str, " ", &next);
-    bool32 found = false;
+    bool found = false;
     
     while (wext != NULL && !found) {
         wext = strtok_s(NULL, " ", &next);
@@ -85,7 +85,7 @@ void win32_init_opengl_extensions()
 	pfd.cDepthBits = 24;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 
-	s32 pixelFormatNumber = ChoosePixelFormat(dummy_dc, &pfd);
+	int pixelFormatNumber = ChoosePixelFormat(dummy_dc, &pfd);
 	SetPixelFormat(dummy_dc, pixelFormatNumber, &pfd);
 
 	HGLRC dummy_context = wglCreateContext(dummy_dc);
@@ -168,6 +168,7 @@ HGLRC win32_create_gl_context(HWND hwnd)
 	glDebugMessageCallback(gl_message_callback, 0);
 
 	glEnable(GL_DEPTH_TEST);
+
 	glEnable(GL_BLEND);  
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 

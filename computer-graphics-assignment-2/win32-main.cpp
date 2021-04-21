@@ -32,7 +32,7 @@ LRESULT CALLBACK window_proc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return TRUE;
 }
 
-real64 GetHighResolutionTime(LARGE_INTEGER freq)
+double GetHighResolutionTime(LARGE_INTEGER freq)
 {
 	LARGE_INTEGER time;
 	QueryPerformanceCounter(&time);
@@ -88,22 +88,22 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	RECT client;
 	GetClientRect(hwnd, &client);
-	u32 w = client.right;
-	u32 h = client.bottom;
+	unsigned int w = client.right;
+	unsigned int h = client.bottom;
 	app_state *state = app_init(w, h);
 
 	if (state) {
-		real64 dt = 0;
-		real64 dt_elapsed = 0;
+		double dt = 0;
+		double dt_elapsed = 0;
 		running = true;
 
-		const u32 FPS = 60;
-		const real32 ms_per_frame = 1000. / FPS;
+		const unsigned int FPS = 60;
+		const float ms_per_frame = 1000. / FPS;
 
 		while (running) {
 			MSG msg;
 
-			real64 start;
+			double start;
 			start = GetHighResolutionTime(freq);
 
 			app_input input = {};
@@ -112,8 +112,6 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 			BYTE keys[256];
 			GetKeyboardState(keys);
-			input.keyboard.wireframe.started_down = keys['G'] & 0x80;
-			input.keyboard.fly.started_down = keys['F'] & 0x80;
 
 			while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
 				if (msg.message == WM_QUIT) {
@@ -134,21 +132,25 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 				input.keyboard.cam_down.ended_down = keys[VK_DOWN] & 0x80;
 				input.keyboard.cam_left.ended_down = keys[VK_LEFT] & 0x80;
 				input.keyboard.cam_right.ended_down = keys[VK_RIGHT] & 0x80;
-				input.keyboard.wireframe.ended_down = keys['G'] & 0x80;
-				input.keyboard.wireframe.toggled = !input.keyboard.wireframe.started_down && keys['G'] & 0x80;
-				input.keyboard.fly.ended_down = keys['F'] & 0x80;
-				input.keyboard.fly.toggled = !input.keyboard.fly.started_down && keys['F'] & 0x80;
+
+				POINT p;
+				GetCursorPos(&p);
+				ScreenToClient(hwnd, &p);
+				input.mouse.pos.x = p.x;
+				input.mouse.pos.y = p.y;
+
+				input.mouse.left.ended_down = (GetAsyncKeyState(VK_LBUTTON) & 0x8000);
 
 				RECT client;
 				GetClientRect(hwnd, &client);
-				window_info.w = client.right;
-				window_info.h = client.bottom;
+				window_info.w = client.right - client.left;
+				window_info.h = client.bottom - client.top;
 				window_info.resize = window_resized;
 				window_info.running = running;
 
 				app_update_and_render(ms_per_frame / 1000.f, state, &input, &window_info);
 
-				real64 finish = GetHighResolutionTime(freq);
+				double finish = GetHighResolutionTime(freq);
 				dt = finish - start;
 
 				if (dt < ms_per_frame) {

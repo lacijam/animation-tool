@@ -5,15 +5,19 @@
 #include <random>
 #include <vector>
 #include <array>
+#include <functional>
 
-#include "types.h"
 #include "maths.h"
 #include "camera.h"
+#include "object.h"
+#include "node.h"
+#include "skybox.h"
+#include "bitmap.h"
 
 struct app_button_state {
-    bool32 started_down;
-    bool32 ended_down;
-    bool32 toggled;
+    bool started_down;
+    bool ended_down;
+    bool toggled;
 };
 
 struct app_keyboard_input {
@@ -28,81 +32,157 @@ struct app_keyboard_input {
             app_button_state cam_down;
             app_button_state cam_left;
             app_button_state cam_right;
-            app_button_state wireframe;
-            app_button_state fly;
         };
     };
 };
 
-struct app_input {
-    app_keyboard_input keyboard;
+struct app_mouse_state {
+    unsigned int x, y;
 };
 
-struct app_memory {
-    bool32 is_initialized;
-    u64 free_offset;
-    u64 permenant_storage_size;
-    void *permenant_storage;
+struct app_mouse_input {
+    union {
+        app_button_state buttons[2];
+        struct {
+            app_button_state left;
+            app_button_state right;
+        };
+    };
+    app_mouse_state pos;
+};
+
+struct app_input {
+    app_keyboard_input keyboard;
+    app_mouse_input mouse;
 };
 
 struct app_window_info {
-    u32 w, h;
-    bool32 resize, running;
+    unsigned int w, h;
+    bool resize, running;
 };
 
-struct SimpleShader {
-    u32 program;
-    u32 projection;
-    u32 view;
-    u32 model;
-    u32 light_space_matrix;
-    u32 shadow_map;
-    u32 ambient_strength;
-    u32 diffuse_strength;
-    u32 gamma_correction;
-    u32 light_pos;
-    u32 light_colour;
-    u32 object_colour;
+struct TexturedShader {
+    unsigned int program;
+    unsigned int projection;
+    unsigned int view;
+    unsigned int model;
+    unsigned int light_space_matrix;
+    unsigned int shadow_map;
+    unsigned int gamma_correction;
+    unsigned int view_position;
+    unsigned int texture;
+};
+
+struct DiffuseShader {
+    unsigned int program;
+    unsigned int projection;
+    unsigned int view;
+    unsigned int model;
+    unsigned int light_space_matrix;
+    unsigned int shadow_map;
+    unsigned int gamma_correction;
+    unsigned int view_position;
+    unsigned int object_colour;
+};
+
+struct InterfaceShader {
+    unsigned int program;
+    unsigned int projection;
+    unsigned int model;
+    unsigned int texture;
 };
 
 struct DepthShader {
-    u32 program;
-    u32 projection;
-    u32 view;
-    u32 model;
+    unsigned int program;
+    unsigned int projection;
+    unsigned int view;
+    unsigned int model;
+};
+
+struct OutlineShader {
+    unsigned int program;
+    unsigned int projection;
+    unsigned int view;
+    unsigned int model;
+};
+
+struct SkyboxShader {
+    unsigned int program;
+    unsigned int projection;
+    unsigned int view;
+    unsigned int skybox;
 };
 
 struct Vertex {
     V3 pos;
     V3 nor;
+    V2 tex;
 };
 
 struct QuadIndices {
-	u32 i[6];
+	unsigned int i[6];
 };
 
 struct Light {
     V3 pos, colour;
-    real32 ambient, diffuse, specular;
+    float ambient, diffuse, specular;
+};
+
+struct Button {
+    unsigned int texture;
+    V2 pos, size;
+    std::function<void(app_state*)> on_click;
 };
 
 struct app_state {
     app_window_info window_info;
 
-    SimpleShader simple_shader;
+    TexturedShader textured_shader;
+    DiffuseShader diffuse_shader;
+    InterfaceShader interface_shader;
     DepthShader depth_shader;
+    OutlineShader outline_shader;
+    SkyboxShader skybox_shader;
 
-    Camera cur_cam;
-    Light light;
+    Camera *cur_cam;
+    Camera main_cam;
+    Camera skeleton_cam;
 
-    std::vector<std::thread> generation_threads;
+    Light light_0, light_1;
+    Skybox *skybox;
+
+    std::vector<Button> buttons;
+    std::vector<Node *> limbs;
+    std::vector<Node> backup; // Stores the limbs when animation is played.
+    std::vector<std::vector<Node>> key_frames;
+    Node *selected;
+
+    Object *box, *sphere;
+
+    float model_stack[256];
+    unsigned int depth;
+
     std::mt19937 rng;
 
-    u32 triangle_vao, quad_vbo, quad_ebo;
-    u32 depth_map_fbo, depth_map;
+    V3 ray_pos, ray_dir;
+    V3 cylinders[20];
+
+    unsigned int triangle_vao, quad_vbo, quad_ebo;
+    unsigned int cylinder_vao, cylinder_vbo, cylinder_ebo;
+    unsigned int interface_vao, interface_vbo, interface_ebo;
+    unsigned int depth_map_fbo, depth_map;
+
+    unsigned int floor_tex, pos_tex, rot_tex, x_tex, y_tex, z_tex, inc_tex, dec_tex, play_tex, cam1_tex, cam2_tex;
+    
+    unsigned int edit_mode;
+    unsigned int axis;
+
+    float dt;
+
+    bool playing;
 };
 
-extern void app_update_and_render(real32 dt, app_state *state, app_input *input, app_window_info *window_info);
-extern app_state *app_init(u32 w, u32 h);
+extern void app_update_and_render(float dt, app_state *state, app_input *input, app_window_info *window_info);
+extern app_state *app_init(unsigned int w, unsigned int h);
 
 #endif

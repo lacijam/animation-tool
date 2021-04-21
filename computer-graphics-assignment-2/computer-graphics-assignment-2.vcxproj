@@ -20,19 +20,26 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="bitmap.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="maths.cpp" />
+    <ClCompile Include="node.cpp" />
+    <ClCompile Include="object.cpp" />
     <ClCompile Include="opengl-util.cpp" />
+    <ClCompile Include="skybox.cpp" />
     <ClCompile Include="win32-opengl.cpp" />
     <ClCompile Include="win32-main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app.h" />
+    <ClInclude Include="bitmap.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="maths.h" />
+    <ClInclude Include="node.h" />
+    <ClInclude Include="object.h" />
     <ClInclude Include="opengl-util.h" />
     <ClInclude Include="shaders.h" />
-    <ClInclude Include="types.h" />
+    <ClInclude Include="skybox.h" />
     <ClInclude Include="win32-opengl.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
